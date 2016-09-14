@@ -2,7 +2,7 @@
 /*
 Plugin Name: Repertuar Kina Widget JS
 Description: Widżet do strony Centrum Sztuki wyświetlający z odnośnik do repertuaru kina
-Version: 0.1
+Version: 0.2
 Author: Jurek Skowron
 */
 
