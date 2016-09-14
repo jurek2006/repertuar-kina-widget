@@ -9,9 +9,14 @@ Author: Jurek Skowron
 class repertuarKinaWidgetJS extends WP_Widget {
 
         // constructor
-        function repertuarKinaWidgetJS() {
-                parent::WP_Widget(false, $name = __('Repertuar kina Widget', 'wp_widget_plugin') );
-        }
+        function __construct() {
+
+			parent::__construct(
+				'repertuar-kina-widget', // Base ID
+				__( 'Repertuar kina', 'repertuar-kina-widget' ), // Name
+				array( 'description' => __( 'Widżet repertuaru kina' ), ) // Args
+			);
+		}
 
         // widget form creation
         function form($instance) {      
