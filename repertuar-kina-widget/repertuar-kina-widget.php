@@ -1,8 +1,8 @@
-﻿<?php
+<?php
 /*
 Plugin Name: Repertuar Kina Widget JS
 Description: Widżet do strony Centrum Sztuki wyświetlający z odnośnik do repertuaru kina
-Version: 0.2
+Version: 0.3
 Author: Jurek Skowron
 */
 
@@ -61,6 +61,8 @@ class repertuarKinaWidgetJS extends WP_Widget {
 			   	<div class="repertuar-kina-widget clearfix">
                 <a href="<?php echo home_url()?>/kino/"><img src="<?php echo plugin_dir_url( __FILE__ );?>img/kino-repertuar.png" alt="Repertuar Kina Odra w Oławie" /></a>
                 <!--<img src="<?php //echo get_stylesheet_directory_uri()?>/_repertuar.jpg" />-->
+
+
                 
                 <?php
 					//wyświetlenie obrazków aktualnych filmów
@@ -75,35 +77,44 @@ class repertuarKinaWidgetJS extends WP_Widget {
 					//get pods object
 	
 					$pods = pods( 'projekcje', $params );
-					//loop through records
+					//pętla po wszystkich znalezionych (przyszłych) projekcjach - jeśli takie są
 					//ID istniejących obrazków jest zapisywane do tabeli $picturesIDs
 					//filmy dla których nie ma ustawionego obrazka są pomijane
 					if ( $pods->total() > 0 ) {
-						while ( $pods->fetch() ) {
-							$tytul_filmu =  $pods->display('film');
-							$picture = $pods->field('film.obraz');
-							if (( !is_null($picture) )&&(!empty($picture))){
-								$picturesIDs[]=$picture['ID'];
-							}//if (( !is_null($picture) )&&(!empty($picture)))
+							while ( $pods->fetch() ) {
+								$tytul_filmu =  $pods->display('film');
+								$picture = $pods->field('film.obraz');
+								if (( !is_null($picture) )&&(!empty($picture))){
+									$picturesIDs[]=$picture['ID'];
+								}//if (( !is_null($picture) )&&(!empty($picture)))
+							
+							}//while ( $pods->fetch() 
 						
-						}//while ( $pods->fetch() 
+
+						
+						//pozbycie się duplikatów z tabeli $picturesIDs żeby obrazek danego filmu się nie powtarzał
+					  	$picturesIDs = array_unique($picturesIDs);
+						
+						$licznik = 0; //licznik obrazków do wyświetlenia - zastosowany zamiast $i, ponieważ niektóre obrazki mogą okazać się false
+						foreach ($picturesIDs as $key => $img){
+							//przegląda wszystkie wpisy w tabeli $picturesIDs (jest ona niekolejna, dlatego foreach
+							//jeśli znalezione zostaną 3 obrazki następuje break, jeśli mniej, to kolejna część doda "wypełniacze"
+							echo wp_get_attachment_image( $img, 'film-zapowiedz', false, array('class'	=> "repertuar-okladka ") );
+							$licznik++;
+							if($licznik == 3)
+								break;
+						}
+
 					}//if ( $pods->total() > 0 )
-					
-					//pozbycie się duplikatów z tabeli $picturesIDs żeby obrazek danego filmu się nie powtarzał
-				  	$picturesIDs = array_unique($picturesIDs);
-					
-					$licznik = 0; //licznik obrazków do wyświetlenia - zastosowany zamiast $i, ponieważ niektóre obrazki mogą okazać się false
-					foreach ($picturesIDs as $key => $img){
-						//przegląda wszystkie wpisy w tabeli $picturesIDs (jest ona niekolejna, dlatego foreach
-						//jeśli znalezione zostaną 3 obrazki następuje break, jeśli mniej, to kolejna część doda "wypełniacze"
-						echo wp_get_attachment_image( $img, 'film-zapowiedz', false, array('class'	=> "repertuar-okladka ") );
-						$licznik++;
-						if($licznik == 3)
-							break;
+					else{
+					// jeśli nie ma żadnej przyszłej projekcji licznik ustawiany jest na sztywno na 0 - awaryjnie traktowane jest to jak gdyby był tylko jeden film ($licznik==1)
+					// wyświetla się zajmujący "dwa miejsca okładki"
+						$licznik = 0;
 					}
 
+
 					
-					if($licznik==1){
+					if($licznik<=1){
 					//jeśli jest tylko jeden obrazek aktywnych filmów zaplanowanych projekcji to banner dopełniany jest obrazkiem 
 					//loga na dwa pola
 					?>
